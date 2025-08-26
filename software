@@ -1,0 +1,44 @@
+# Package manager helpers
+# Paru (Arch linux)
+# Nala (Ubuntu)
+
+# Applications
+git
+curl
+gh
+wezterm
+neovim
+tmux
+eza
+lazygit
+docker
+docker-compose
+lazydocker
+bat
+ripgrep
+fd
+fzf
+tldr
+just
+jqp
+yt-dlp
+fastfetch
+fontconfig
+trash-cli
+fnm
+yazi
+dif
+tabiew
+fx
+# direnv?
+
+# Fonts
+# Fira Code
+# Noto Fonts Emoji
+# Nerdfonts
+# Font Awesome
+
+# Programming languages
+# Go
+# Rust
+# Node
