@@ -131,11 +131,11 @@ install_packages() {
     #     packages="$packages trash-cli"
     #     fi
     
-    log_info "Installing packages: $packages"
+    log_info "Installing packages..."
     
     case "$PACKAGE_MANAGER" in
         pacman)
-            install_arch_packages "$packages"
+            install_arch_packages
             ;;
         nala|apt)
             $PRIVILEGE_CMD $PACKAGE_MANAGER update
