@@ -252,6 +252,6 @@ main() {
 main "$@"
 
 # Install MyPrompt
-git clone --depth=1 https://github.com/fredhawk/myprompt.git && cd myprompt && bash ./setup.sh
+git clone --depth=1 https://github.com/fredhawk/myprompt.git ~/myprompt/ && cd ~/myprompt && bash ./setup.sh
 
 # Finish
