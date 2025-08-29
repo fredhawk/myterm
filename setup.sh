@@ -192,7 +192,7 @@ install_arch_packages() {
 }
 
 install_ubuntu_packages() {
-    local packages="wezterm gh eza fd-find lazygit ripgrep yt-dlp bat tmux just fastfetch"
+    local packages="wezterm gh eza fd-find ripgrep yt-dlp bat tmux just"
     # local aur_helper=""
     
     # Wezterm
