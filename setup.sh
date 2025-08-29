@@ -123,14 +123,6 @@ setup_directories() {
 
 # Installation functions
 install_packages() {
-    # local packages="tmux lazygit bat ripgrep just jqp fastfetc"
-    # if ! command_exists nvim; then
-    #     packages="$packages neovim"
-    #     fi
-    # if ! command_exists trash; then
-    #     packages="$packages trash-cli"
-    #     fi
-    
     log_info "Installing packages..."
     
     case "$PACKAGE_MANAGER" in
@@ -138,8 +130,9 @@ install_packages() {
             install_arch_packages
             ;;
         nala|apt)
-            $PRIVILEGE_CMD $PACKAGE_MANAGER update
-            $PRIVILEGE_CMD $PACKAGE_MANAGER install -y $packages
+            install_ubuntu_packages
+            # $PRIVILEGE_CMD $PACKAGE_MANAGER update
+            # $PRIVILEGE_CMD $PACKAGE_MANAGER install -y $packages
             ;;
         dnf|yum)
             $PRIVILEGE_CMD $PACKAGE_MANAGER install -y $packages
@@ -172,7 +165,6 @@ install_packages() {
 }
 
 install_arch_packages() {
-    # local packages="$1"
     local packages="wezterm github-cli eza fd lazygit ripgrep fx yazi tabiew yt-dlp lazydocker bat tmux just fastfetch btop jqp-bin ttf-nerd-fonts-symbols"
     local aur_helper=""
     
@@ -191,7 +183,6 @@ install_arch_packages() {
         git clone https://aur.archlinux.org/yay.git
         cd yay
         makepkg -si --noconfirm
-        # cd "$MYBASH_DIR"
         rm -rf "$temp_dir"
         aur_helper="yay"
     fi
@@ -200,6 +191,62 @@ install_arch_packages() {
     $aur_helper -S --needed --noconfirm $packages
 }
 
+install_ubuntu_packages() {
+    local packages="wezterm gh eza fd-find lazygit ripgrep yt-dlp bat tmux just fastfetch"
+    # local aur_helper=""
+    
+    # Wezterm
+    curl -fsSL https://apt.fury.io/wez/gpg.key | sudo gpg --yes --dearmor -o /usr/share/keyrings/wezterm-fury.gpg
+    echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' | sudo tee /etc/apt/sources.list.d/wezterm.list
+    sudo chmod 644 /usr/share/keyrings/wezterm-fury.gpg
+
+    # Github Cli
+    (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
+	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
+	&& out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+	&& cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
+	&& sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+	&& sudo mkdir -p -m 755 /etc/apt/sources.list.d \
+	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+	# && sudo apt update \
+	# && sudo apt install gh -y
+ 
+    # Eza
+    sudo mkdir -p /etc/apt/keyrings
+    wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
+    echo "deb [signed-by=/etc/apt/keyrings/gierens.gpg] http://deb.gierens.de stable main" | sudo tee /etc/apt/sources.list.d/gierens.list
+    sudo chmod 644 /etc/apt/keyrings/gierens.gpg /etc/apt/sources.list.d/gierens.list
+    # sudo apt update
+    # sudo apt install -y eza
+
+    # Yt-dlp
+    sudo add-apt-repository ppa:tomtomtom/yt-dlp
+
+    log_info "Installing packages with apt..."
+    $PRIVILEGE_CMD $PACKAGE_MANAGER update
+    $PRIVILEGE_CMD $PACKAGE_MANAGER install -y $packages
+    # # Install AUR helper if needed
+    # if command_exists yay; then
+    #     aur_helper="yay"
+    # elif command_exists paru; then
+    #     aur_helper="paru"
+    # else
+    #     log_info "Installing yay AUR helper..."
+    #     $PRIVILEGE_CMD pacman -S --needed --noconfirm base-devel git
+    #     
+    #     local temp_dir
+    #     temp_dir=$(mktemp -d)
+    #     cd "$temp_dir"
+    #     git clone https://aur.archlinux.org/yay.git
+    #     cd yay
+    #     makepkg -si --noconfirm
+    #     rm -rf "$temp_dir"
+    #     aur_helper="yay"
+    # fi
+    
+    # log_info "Installing packages with $aur_helper..."
+    # $aur_helper -S --needed --noconfirm $packages
+}
 # install_nerd_font() {
 #     local font_name="MesloLGS Nerd Font"
 #     
