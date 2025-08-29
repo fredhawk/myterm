@@ -191,7 +191,7 @@ install_arch_packages() {
         git clone https://aur.archlinux.org/yay.git
         cd yay
         makepkg -si --noconfirm
-        cd "$MYBASH_DIR"
+        # cd "$MYBASH_DIR"
         rm -rf "$temp_dir"
         aur_helper="yay"
     fi
