@@ -336,6 +336,8 @@ main() {
     # Installation phase
     install_packages || exit 1
     # install_nerd_font
+
+    setup_gitconfig || exit 1
     
     log_success "Setup completed successfully!"
 }
