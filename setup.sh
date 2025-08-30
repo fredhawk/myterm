@@ -246,20 +246,22 @@ fi
     rm -rf "$temp_dir"
 }
 
-# install_zoxide() {
-#     if command_exists zoxide; then
-#         log_info "Zoxide already installed"
-#         return 0
-#     fi
-#     
-#     log_info "Installing Zoxide..."
-#     if curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh; then
-#         log_success "Zoxide installed successfully"
-#     else
-#         log_error "Failed to install Zoxide"
-#         return 1
-#     fi
-# }
+install_tpm() {
+    local tpm_dir = "$HOME/.tmux/plugins/tpm/"
+    if [[ -d "$tpm_dir" ]]; then
+        log_info "TPM already installed"
+        return 0
+    fi
+    
+    log_info "Installing TPM..."
+    if git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm; then
+    # if curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/ain/install.sh | sh; then
+        log_success "TPM installed successfully"
+    else
+        log_error "Failed to install TPM"
+        return 1
+    fi
+}
 
 # Configuration functions
 setup_gitconfig() {
@@ -359,6 +361,7 @@ main() {
     
     # Installation phase
     install_packages || exit 1
+    install_tpm || exit 1
     install_nerd_font
 
     setup_gitconfig || exit 1
