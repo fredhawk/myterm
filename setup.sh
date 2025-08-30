@@ -274,6 +274,18 @@ setup_gitconfig() {
     fi
 }
 
+setup_wezterm_config() {
+    local user_home
+    user_home=$(get_user_home)
+    local config_file="$user_home/.wezterm.lua"
+    
+    if [ -f "$SCRIPT_DIR/.wezterm.lua" ]; then
+        ln -sf "$SCRIPT_DIR/.wezterm.lua" "$config_file"
+        log_success "Wezterm config linked"
+    else
+        log_warning ".wezterm.lua file not found"
+    fi
+}
 # setup_bash_config() {
 #     local user_home
 #     user_home=$(get_user_home)
