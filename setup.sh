@@ -245,6 +245,79 @@ install_ubuntu_packages() {
 #     rm -rf "$temp_dir"
 # }
 
+# install_zoxide() {
+#     if command_exists zoxide; then
+#         log_info "Zoxide already installed"
+#         return 0
+#     fi
+#     
+#     log_info "Installing Zoxide..."
+#     if curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh; then
+#         log_success "Zoxide installed successfully"
+#     else
+#         log_error "Failed to install Zoxide"
+#         return 1
+#     fi
+# }
+
+# Configuration functions
+setup_gitconfig() {
+    local user_home
+    user_home=$(get_user_home)
+    local gitconfig_dir ="$user_home/"
+    local config_file="$gitconfig_dir/.gitconfig"
+    
+    mkdir -p "$gitconfig_dir"
+    
+    if [ -f "$SCRIPT_DIR/.gitconfig" ]; then
+        ln -sf "$SCRIPT_DIR/.gitconfig" "$config_file"
+        log_success ".gitconfig linked"
+    else
+        log_warning ".gitconfig file not found"
+    fi
+}
+
+# setup_bash_config() {
+#     local user_home
+#     user_home=$(get_user_home)
+#     local bashrc="$user_home/.bashrc"
+#     local bash_profile="$user_home/.bash_profile"
+#     local starship_config="$user_home/.config/starship.toml"
+#     
+#     # Backup existing bashrc
+#     if [ -f "$bashrc" ]; then
+#         log_info "Backing up existing .bashrc"
+#         mv "$bashrc" "$bashrc.backup.$(date +%Y%m%d_%H%M%S)"
+#     fi
+#     
+#     # Link new configurations
+#     if [ -f "$SCRIPT_DIR/.bashrc" ]; then
+#         ln -sf "$SCRIPT_DIR/.bashrc" "$bashrc"
+#         log_success "Bashrc configuration linked"
+#     else
+#         log_error "Bashrc template not found"
+#         return 1
+#     fi
+#     
+#     if [ -f "$SCRIPT_DIR/starship.toml" ]; then
+#         ln -sf "$SCRIPT_DIR/starship.toml" "$starship_config"
+#         log_success "Starship configuration linked"
+#     else
+#         log_warning "Starship config template not found"
+#     fi
+#     
+#     # Create bash_profile if needed
+#     if [ ! -f "$bash_profile" ]; then
+#         cat > "$bash_profile" << 'EOF'
+# # Source bashrc if it exists
+# if [ -f ~/.bashrc ]; then
+#     . ~/.bashrc
+# fi
+# EOF
+#         log_success "Created .bash_profile"
+#     fi
+# }
+
 # Main execution
 main() {
     log_info "Starting MyPrompt setup..."
