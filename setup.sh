@@ -347,6 +347,7 @@ main() {
     # install_nerd_font
 
     setup_gitconfig || exit 1
+    setup_wezterm_config || exit 1
     
     log_success "Setup completed successfully!"
 }
