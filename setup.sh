@@ -247,7 +247,7 @@ fi
 }
 
 install_tpm() {
-    local tpm_dir = "$HOME/.tmux/plugins/tpm/"
+    local tpm_dir="${HOME}/.tmux/plugins/tpm/"
     if [[ -d "$tpm_dir" ]]; then
         log_info "TPM already installed"
         return 0
