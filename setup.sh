@@ -264,10 +264,7 @@ install_ubuntu_packages() {
 setup_gitconfig() {
     local user_home
     user_home=$(get_user_home)
-    local gitconfig_dir ="$user_home/"
-    local config_file="$gitconfig_dir/.gitconfig"
-    
-    mkdir -p "$gitconfig_dir"
+    local config_file="$user_home/.gitconfig"
     
     if [ -f "$SCRIPT_DIR/.gitconfig" ]; then
         ln -sf "$SCRIPT_DIR/.gitconfig" "$config_file"
