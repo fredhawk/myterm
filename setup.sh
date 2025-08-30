@@ -219,31 +219,32 @@ install_ubuntu_packages() {
     $PRIVILEGE_CMD $PACKAGE_MANAGER update
     $PRIVILEGE_CMD $PACKAGE_MANAGER install -y $packages
 }
-# install_nerd_font() {
-#     local font_name="MesloLGS Nerd Font"
-#     
-#     if fc-list | grep -qi "meslo"; then
-#         log_info "Nerd font already installed"
-#         return 0
-# fi
-#     log_info "Installing $font_name..."
-#     
-#     local font_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Meslo.zip"
-#     local temp_dir
-#     temp_dir=$(mktemp -d)
-#     
-#     if wget -q "$font_url" -O "$temp_dir/Meslo.zip"; then
-#         unzip -q "$temp_dir/Meslo.zip" -d "$temp_dir"
-#         mkdir -p "$FONT_DIR/MesloLGS"
-#         find "$temp_dir" -name "*.ttf" -exec mv {} "$FONT_DIR/MesloLGS/" \;
-#         fc-cache -fv >/dev/null 2>&1
-#         log_success "Font installed successfully"
-#     else
-#         log_warning "Failed to download font"
-#     fi
-#     
-#     rm -rf "$temp_dir"
-# }
+
+install_nerd_font() {
+    local font_name="Symbols Nerd Font"
+    
+    if fc-list | grep -qi "symbol"; then
+        log_info "Nerd font already installed"
+        return 0
+fi
+    log_info "Installing $font_name..."
+    
+    local font_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/NerdFontsSymbolsOnly.zip"
+    local temp_dir
+    temp_dir=$(mktemp -d)
+    
+    if wget -q "$font_url" -O "$temp_dir/NerdFontsSymbolsOnly.zip"; then
+        unzip -q "$temp_dir/NerdFontsSymbolsOnly.zip" -d "$temp_dir"
+        mkdir -p "$FONT_DIR/SymbolsOnly"
+        find "$temp_dir" -name "*.ttf" -exec mv {} "$FONT_DIR/SymbolsOnly/" \;
+        fc-cache -fv >/dev/null 2>&1
+        log_success "Font installed successfully"
+    else
+        log_warning "Failed to download font"
+    fi
+    
+    rm -rf "$temp_dir"
+}
 
 # install_zoxide() {
 #     if command_exists zoxide; then
@@ -286,6 +287,20 @@ setup_wezterm_config() {
         log_warning ".wezterm.lua file not found"
     fi
 }
+
+setup_tmux_config() {
+    local user_home
+    user_home=$(get_user_home)
+    local config_file="$user_home/.tmux.conf"
+    
+    if [ -f "$SCRIPT_DIR/.tmux.conf" ]; then
+        ln -sf "$SCRIPT_DIR/.tmux.conf" "$config_file"
+        log_success "Tmux config linked"
+    else
+        log_warning ".tmux.conf file not found"
+    fi
+}
+
 # setup_bash_config() {
 #     local user_home
 #     user_home=$(get_user_home)
@@ -344,7 +359,7 @@ main() {
     
     # Installation phase
     install_packages || exit 1
-    # install_nerd_font
+    install_nerd_font
 
     setup_gitconfig || exit 1
     setup_wezterm_config || exit 1
