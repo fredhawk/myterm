@@ -303,6 +303,20 @@ setup_tmux_config() {
     fi
 }
 
+setup_nvim_config() {
+    local user_home
+    user_home=$(get_user_home)
+    local config_dir="$user_home/.config/nvim"
+    # local config_file="$user_home/.tmux.conf"
+    
+    if [ -f "$SCRIPT_DIR/nvim" ]; then
+        ln -sf "$SCRIPT_DIR/nvim" "$config_dit"
+        log_success "Neovim config linked"
+    else
+        log_warning "Neovim not found"
+    fi
+}
+
 # setup_bash_config() {
 #     local user_home
 #     user_home=$(get_user_home)
@@ -367,6 +381,7 @@ main() {
     setup_gitconfig || exit 1
     setup_wezterm_config || exit 1
     setup_tmux_config || exit 1
+    setup_nvim_config || exit 1
     
     log_success "Setup completed successfully!"
 }
