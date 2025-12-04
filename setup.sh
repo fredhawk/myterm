@@ -55,7 +55,7 @@ get_user_home() {
 # System detection
 detect_package_manager() {
     local managers="nala apt dnf yum pacman zypper emerge xbps-install nix-env"
-    
+
     for manager in $managers; do
         if command_exists "$manager"; then
             PACKAGE_MANAGER="$manager"
@@ -83,18 +83,18 @@ detect_privilege_escalation() {
 validate_requirements() {
     local requirements="curl git"
     local missing=""
-    
+
     for req in $requirements; do
         if ! command_exists "$req"; then
             missing="$missing $req"
-    fi
+        fi
     done
 
     if [ -n "$missing" ]; then
         log_error "Missing required commands:$missing"
         return 1
     fi
-    
+
     return 0
 }
 
@@ -108,64 +108,64 @@ validate_permissions() {
         log_error "No write permission to script directory: $SCRIPT_DIR"
         return 1
     fi
-    
+
     return 0
 }
 
 # Setup functions
 setup_directories() {
     log_info "Setting up directories..."
-    
+
     mkdir -p "$CONFIG_DIR" "$FONT_DIR"
-    
+
     log_info "Working from current directory: $SCRIPT_DIR"
 }
 
 # Installation functions
 install_packages() {
     log_info "Installing packages..."
-    
+
     case "$PACKAGE_MANAGER" in
-        pacman)
-            install_arch_packages
-            ;;
-        nala|apt)
-            install_ubuntu_packages
-            ;;
-        dnf|yum)
-            $PRIVILEGE_CMD $PACKAGE_MANAGER install -y $packages
-            ;;
-        emerge)
-            local emerge_packages="app-shells/bash app-shells/bash-completion app-arch/tar sys-apps/bat app-text/tree app-text/multitail app-misc/trash-cli"
-            if ! command_exists nvim; then
-                emerge_packages="$emerge_packages app-editors/neovim"
-    fi
-            $PRIVILEGE_CMD $PACKAGE_MANAGER -v $emerge_packages
-            ;;
-        xbps-install)
-            $PRIVILEGE_CMD $PACKAGE_MANAGER -Sy $packages
-            ;;
-        nix-env)
-            local nix_packages="nixos.bash nixos.bash-completion nixos.gnutar nixos.bat nixos.tree nixos.multitail nixos.trash-cli"
-            if ! command_exists nvim; then
-                nix_packages="$nix_packages nixos.neovim"
+    pacman)
+        install_arch_packages
+        ;;
+    nala | apt)
+        install_ubuntu_packages
+        ;;
+    dnf | yum)
+        $PRIVILEGE_CMD $PACKAGE_MANAGER install -y $packages
+        ;;
+    emerge)
+        local emerge_packages="app-shells/bash app-shells/bash-completion app-arch/tar sys-apps/bat app-text/tree app-text/multitail app-misc/trash-cli"
+        if ! command_exists nvim; then
+            emerge_packages="$emerge_packages app-editors/neovim"
         fi
-            $PRIVILEGE_CMD $PACKAGE_MANAGER -iA $nix_packages
-            ;;
-        zypper)
-            $PRIVILEGE_CMD $PACKAGE_MANAGER install -y $packages
-            ;;
-        *)
-            log_error "Unsupported package manager: $PACKAGE_MANAGER"
-            return 1
-            ;;
+        $PRIVILEGE_CMD $PACKAGE_MANAGER -v $emerge_packages
+        ;;
+    xbps-install)
+        $PRIVILEGE_CMD $PACKAGE_MANAGER -Sy $packages
+        ;;
+    nix-env)
+        local nix_packages="nixos.bash nixos.bash-completion nixos.gnutar nixos.bat nixos.tree nixos.multitail nixos.trash-cli"
+        if ! command_exists nvim; then
+            nix_packages="$nix_packages nixos.neovim"
+        fi
+        $PRIVILEGE_CMD $PACKAGE_MANAGER -iA $nix_packages
+        ;;
+    zypper)
+        $PRIVILEGE_CMD $PACKAGE_MANAGER install -y $packages
+        ;;
+    *)
+        log_error "Unsupported package manager: $PACKAGE_MANAGER"
+        return 1
+        ;;
     esac
 }
 
 install_arch_packages() {
     local packages="wezterm github-cli eza fd lazygit ripgrep fx yazi tabiew yt-dlp lazydocker bat tmux just fastfetch btop jqp-bin ttf-nerd-fonts-symbols"
     local aur_helper=""
-    
+
     # Install AUR helper if needed
     if command_exists yay; then
         aur_helper="yay"
@@ -174,7 +174,7 @@ install_arch_packages() {
     else
         log_info "Installing yay AUR helper..."
         $PRIVILEGE_CMD pacman -S --needed --noconfirm base-devel git
-        
+
         local temp_dir
         temp_dir=$(mktemp -d)
         cd "$temp_dir"
@@ -184,28 +184,28 @@ install_arch_packages() {
         rm -rf "$temp_dir"
         aur_helper="yay"
     fi
-    
+
     log_info "Installing packages with $aur_helper..."
     $aur_helper -S --needed --noconfirm $packages
 }
 
 install_ubuntu_packages() {
     local packages="wezterm gh eza fd-find ripgrep yt-dlp bat tmux just"
-    
+
     # Wezterm
     curl -fsSL https://apt.fury.io/wez/gpg.key | sudo gpg --yes --dearmor -o /usr/share/keyrings/wezterm-fury.gpg
     echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' | sudo tee /etc/apt/sources.list.d/wezterm.list
     sudo chmod 644 /usr/share/keyrings/wezterm-fury.gpg
 
     # Github Cli
-    (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
-	&& sudo mkdir -p -m 755 /etc/apt/keyrings \
-	&& out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-	&& cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg > /dev/null \
-	&& sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-	&& sudo mkdir -p -m 755 /etc/apt/sources.list.d \
-	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
- 
+    (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) &&
+        sudo mkdir -p -m 755 /etc/apt/keyrings &&
+        out=$(mktemp) && wget -nv -O$out https://cli.github.com/packages/githubcli-archive-keyring.gpg &&
+        cat $out | sudo tee /etc/apt/keyrings/githubcli-archive-keyring.gpg >/dev/null &&
+        sudo chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg &&
+        sudo mkdir -p -m 755 /etc/apt/sources.list.d &&
+        echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list >/dev/null
+
     # Eza
     sudo mkdir -p /etc/apt/keyrings
     wget -qO- https://raw.githubusercontent.com/eza-community/eza/main/deb.asc | sudo gpg --dearmor -o /etc/apt/keyrings/gierens.gpg
@@ -222,17 +222,17 @@ install_ubuntu_packages() {
 
 install_nerd_font() {
     local font_name="Symbols Nerd Font"
-    
+
     if fc-list | grep -qi "symbol"; then
         log_info "Nerd font already installed"
         return 0
-fi
+    fi
     log_info "Installing $font_name..."
-    
+
     local font_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/NerdFontsSymbolsOnly.zip"
     local temp_dir
     temp_dir=$(mktemp -d)
-    
+
     if wget -q "$font_url" -O "$temp_dir/NerdFontsSymbolsOnly.zip"; then
         unzip -q "$temp_dir/NerdFontsSymbolsOnly.zip" -d "$temp_dir"
         mkdir -p "$FONT_DIR/SymbolsOnly"
@@ -242,7 +242,7 @@ fi
     else
         log_warning "Failed to download font"
     fi
-    
+
     rm -rf "$temp_dir"
 }
 
@@ -252,10 +252,10 @@ install_tpm() {
         log_info "TPM already installed"
         return 0
     fi
-    
+
     log_info "Installing TPM..."
     if git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm; then
-    # if curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/ain/install.sh | sh; then
+        # if curl -sS https://raw.githubusercontent.com/ajeetdsouza/zoxide/ain/install.sh | sh; then
         log_success "TPM installed successfully"
     else
         log_error "Failed to install TPM"
@@ -268,7 +268,7 @@ setup_gitconfig() {
     local user_home
     user_home=$(get_user_home)
     local config_file="$user_home/.gitconfig"
-    
+
     if [ -f "$SCRIPT_DIR/.gitconfig" ]; then
         ln -sf "$SCRIPT_DIR/.gitconfig" "$config_file"
         log_success ".gitconfig linked"
@@ -281,7 +281,7 @@ setup_wezterm_config() {
     local user_home
     user_home=$(get_user_home)
     local config_file="$user_home/.wezterm.lua"
-    
+
     if [ -f "$SCRIPT_DIR/.wezterm.lua" ]; then
         ln -sf "$SCRIPT_DIR/.wezterm.lua" "$config_file"
         log_success "Wezterm config linked"
@@ -294,7 +294,7 @@ setup_tmux_config() {
     local user_home
     user_home=$(get_user_home)
     local config_file="$user_home/.tmux.conf"
-    
+
     if [ -f "$SCRIPT_DIR/.tmux.conf" ]; then
         ln -sf "$SCRIPT_DIR/.tmux.conf" "$config_file"
         log_success "Tmux config linked"
@@ -308,7 +308,7 @@ setup_nvim_config() {
     user_home=$(get_user_home)
     local config_dir="$user_home/.config/nvim"
     # local config_file="$user_home/.tmux.conf"
-    
+
     if [ -f "$SCRIPT_DIR/nvim" ]; then
         ln -sf "$SCRIPT_DIR/nvim" "$config_dit"
         log_success "Neovim config linked"
@@ -323,13 +323,13 @@ setup_nvim_config() {
 #     local bashrc="$user_home/.bashrc"
 #     local bash_profile="$user_home/.bash_profile"
 #     local starship_config="$user_home/.config/starship.toml"
-#     
+#
 #     # Backup existing bashrc
 #     if [ -f "$bashrc" ]; then
 #         log_info "Backing up existing .bashrc"
 #         mv "$bashrc" "$bashrc.backup.$(date +%Y%m%d_%H%M%S)"
 #     fi
-#     
+#
 #     # Link new configurations
 #     if [ -f "$SCRIPT_DIR/.bashrc" ]; then
 #         ln -sf "$SCRIPT_DIR/.bashrc" "$bashrc"
@@ -338,14 +338,14 @@ setup_nvim_config() {
 #         log_error "Bashrc template not found"
 #         return 1
 #     fi
-#     
+#
 #     if [ -f "$SCRIPT_DIR/starship.toml" ]; then
 #         ln -sf "$SCRIPT_DIR/starship.toml" "$starship_config"
 #         log_success "Starship configuration linked"
 #     else
 #         log_warning "Starship config template not found"
 #     fi
-#     
+#
 #     # Create bash_profile if needed
 #     if [ ! -f "$bash_profile" ]; then
 #         cat > "$bash_profile" << 'EOF'
@@ -361,18 +361,18 @@ setup_nvim_config() {
 # Main execution
 main() {
     log_info "Starting MyPrompt setup..."
-    
+
     # Validation phase
     validate_requirements || exit 1
     validate_permissions || exit 1
-    
+
     # Detection phase
     detect_package_manager || exit 1
     detect_privilege_escalation
-    
+
     # Setup phase
     setup_directories || exit 1
-    
+
     # Installation phase
     install_packages || exit 1
     install_tpm || exit 1
@@ -382,7 +382,7 @@ main() {
     setup_wezterm_config || exit 1
     setup_tmux_config || exit 1
     setup_nvim_config || exit 1
-    
+
     log_success "Setup completed successfully!"
 }
 
